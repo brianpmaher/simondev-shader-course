@@ -6,6 +6,7 @@ import {
   PlaneGeometry,
   Scene,
   ShaderMaterial,
+  TextureLoader,
   Vector4,
   WebGLRenderer,
 } from 'three';
@@ -23,10 +24,14 @@ camera.position.set(0, 0, 1);
 const vertexShader = await fetch('src/shaders/vertex-shader.glsl').then((r) => r.text());
 const fragmentShader = await fetch('src/shaders/fragment-shader.glsl').then((r) => r.text());
 
+const loader = new TextureLoader();
+const imageTexture = loader.load('../assets/textures/dog.jpg');
+
 const material = new ShaderMaterial({
   uniforms: {
     uColor1: { value: new Vector4(1.0, 1.0, 0.0, 1.0) },
     uColor2: { value: new Vector4(0.0, 1.0, 1.0, 1.0) },
+    diffuse: { value: imageTexture },
   },
   vertexShader,
   fragmentShader,
