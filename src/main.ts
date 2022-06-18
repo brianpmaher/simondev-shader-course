@@ -1,17 +1,22 @@
 import {
   Mesh,
   OrthographicCamera,
+  PCFSoftShadowMap,
   PlaneGeometry,
   Scene,
   ShaderMaterial,
   TextureLoader,
   Vector4,
-  WebGLRenderer,
+  WebGLRenderer
 } from 'three';
 
-const renderer = new WebGLRenderer();
-document.body.appendChild(renderer.domElement);
+const renderer = new WebGLRenderer({ antialias: true });
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = PCFSoftShadowMap;
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+
+document.body.appendChild(renderer.domElement);
 window.addEventListener('resize', () => renderer.setSize(window.innerWidth, window.innerHeight));
 
 const scene = new Scene();
