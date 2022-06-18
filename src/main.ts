@@ -3,6 +3,7 @@ import {
   OrthographicCamera,
   PCFSoftShadowMap,
   PlaneGeometry,
+  RepeatWrapping,
   Scene,
   ShaderMaterial,
   TextureLoader,
@@ -29,6 +30,8 @@ const fragmentShader = await fetch('src/shaders/fragment-shader.glsl').then((r) 
 
 const loader = new TextureLoader();
 const lakeTexture = loader.load('../assets/textures/hebgen-lake.jpg');
+lakeTexture.wrapS = RepeatWrapping;
+lakeTexture.wrapT = RepeatWrapping;
 const avatarTexture = loader.load('../assets/textures/avatar.png');
 
 const material = new ShaderMaterial({
