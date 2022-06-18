@@ -1,9 +1,10 @@
 uniform sampler2D uDiffuse;
-uniform vec4 uTint;
+uniform sampler2D uOverlay;
 
 varying vec2 vUv;
 
 void main() {
     vec4 diffuseSample = texture2D(uDiffuse, vUv);
-    gl_FragColor = vec4(diffuseSample.r);
+    vec4 overlaySample = texture2D(uOverlay, vUv);
+    gl_FragColor = mix(diffuseSample, overlaySample, overlaySample.w);
 }

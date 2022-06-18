@@ -7,7 +7,7 @@ import {
   ShaderMaterial,
   TextureLoader,
   Vector4,
-  WebGLRenderer
+  WebGLRenderer,
 } from 'three';
 
 const renderer = new WebGLRenderer({ antialias: true });
@@ -28,11 +28,13 @@ const vertexShader = await fetch('src/shaders/vertex-shader.glsl').then((r) => r
 const fragmentShader = await fetch('src/shaders/fragment-shader.glsl').then((r) => r.text());
 
 const loader = new TextureLoader();
-const imageTexture = loader.load('../assets/textures/hebgen-lake.jpg');
+const lakeTexture = loader.load('../assets/textures/hebgen-lake.jpg');
+const avatarTexture = loader.load('../assets/textures/avatar.png');
 
 const material = new ShaderMaterial({
   uniforms: {
-    uDiffuse: { value: imageTexture },
+    uDiffuse: { value: lakeTexture },
+    uOverlay: { value: avatarTexture },
     uTint: { value: new Vector4(1.0, 0.0, 0.0, 1.0) },
   },
   vertexShader,
@@ -50,5 +52,6 @@ let prevDeltaTime!: number;
   requestAnimationFrame(runLoop);
 
   renderer.render(scene, camera);
+
   prevDeltaTime = deltaTime;
 })(0);
