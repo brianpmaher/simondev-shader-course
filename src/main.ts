@@ -5,8 +5,7 @@ import {
   PlaneGeometry,
   Scene,
   ShaderMaterial,
-  TextureLoader,
-  Vector4,
+  Vector2,
   WebGLRenderer,
 } from 'three';
 
@@ -33,18 +32,16 @@ const fragmentShader = await fetch('src/shaders/fragment-shader.glsl').then(
   (r) => r.text(),
 );
 
-const loader = new TextureLoader();
-const lakeTexture = loader.load('../assets/textures/hebgen-lake.jpg');
-const avatarTexture = loader.load('../assets/textures/avatar.png');
-
 const material = new ShaderMaterial({
   uniforms: {
-    uDiffuse: { value: lakeTexture },
-    uOverlay: { value: avatarTexture },
-    uTint: { value: new Vector4(1.0, 0.0, 0.0, 1.0) },
+    resolution: { value: new Vector2(window.innerWidth, window.innerHeight) },
   },
   vertexShader,
   fragmentShader,
+});
+window.addEventListener('resize', () => {
+  const resolution = material.uniforms.resolution.value;
+  (resolution as Vector2).set(window.innerWidth, window.innerHeight);
 });
 
 const geometry = new PlaneGeometry(1, 1);
