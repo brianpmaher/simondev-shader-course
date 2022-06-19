@@ -1,6 +1,5 @@
 import {
   Mesh,
-  NearestFilter,
   OrthographicCamera,
   PCFSoftShadowMap,
   PlaneGeometry,
@@ -36,7 +35,6 @@ const fragmentShader = await fetch('src/shaders/fragment-shader.glsl').then(
 
 const loader = new TextureLoader();
 const lakeTexture = loader.load('../assets/textures/hebgen-lake.jpg');
-lakeTexture.magFilter = NearestFilter;
 const avatarTexture = loader.load('../assets/textures/avatar.png');
 
 const material = new ShaderMaterial({
