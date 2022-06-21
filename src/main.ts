@@ -5,7 +5,7 @@ import {
   PlaneGeometry,
   Scene,
   ShaderMaterial,
-  Vector2,
+  TextureLoader,
   WebGLRenderer,
 } from 'three';
 
@@ -32,17 +32,21 @@ const fragmentShader = await fetch('src/shaders/fragment-shader.glsl').then(
   (r) => r.text(),
 );
 
+const textureLoader = new TextureLoader();
+const lakeTexture = textureLoader.load('assets/textures/hebgen-lake.jpg');
+
 const material = new ShaderMaterial({
   uniforms: {
-    resolution: { value: new Vector2(window.innerWidth, window.innerHeight) },
+    diffuse1: { value: lakeTexture },
+    time: { value: 0.0 },
   },
   vertexShader,
   fragmentShader,
 });
-window.addEventListener('resize', () => {
-  const resolution = material.uniforms.resolution.value;
-  (resolution as Vector2).set(window.innerWidth, window.innerHeight);
-});
+// window.addEventListener('resize', () => {
+//   const resolution = material.uniforms.resolution.value;
+//   (resolution as Vector2).set(window.innerWidth, window.innerHeight);
+// });
 
 const geometry = new PlaneGeometry(1, 1);
 
@@ -50,11 +54,10 @@ const plane = new Mesh(geometry, material);
 plane.position.set(0.5, 0.5, 0);
 scene.add(plane);
 
-let prevDeltaTime!: number;
-(function runLoop(deltaTime: number) {
+(function runLoop(t: number) {
   requestAnimationFrame(runLoop);
 
-  renderer.render(scene, camera);
+  material.uniforms.time.value = t * 0.001;
 
-  prevDeltaTime = deltaTime;
+  renderer.render(scene, camera);
 })(0);
