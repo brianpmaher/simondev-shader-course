@@ -14,13 +14,11 @@ float remap(float v, float inMin, float inMax, float outMin, float outMax) {
 
 void main() {
     vec4 color = vec4(0.0);
-    vec4 diffuse = texture2D(diffuse, vUv);
 
-    float t = sin((vUv.y + time) * 400.0);
+    float t1 = remap(sin(vUv.y * 400.0 + time * 10.0), -1.0, 1.0, 0.9, 1.0);
+    float t2 = remap(sin(vUv.y * 50.0 - time * 2.0), -1.0, 1.0, 0.9, 1.0);
 
-    vec4 scanLines = vec4(remap(t, -1.0, 1.0, 0.75, 1.0));
-
-    color = diffuse * scanLines;
+    color = texture2D(diffuse, vUv) * t1 * t2;
 
     gl_FragColor = color;
 }
