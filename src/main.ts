@@ -37,16 +37,12 @@ const lakeTexture = textureLoader.load('assets/textures/hebgen-lake.jpg');
 
 const material = new ShaderMaterial({
   uniforms: {
-    diffuse1: { value: lakeTexture },
+    diffuse: { value: lakeTexture },
     time: { value: 0.0 },
   },
   vertexShader,
   fragmentShader,
 });
-// window.addEventListener('resize', () => {
-//   const resolution = material.uniforms.resolution.value;
-//   (resolution as Vector2).set(window.innerWidth, window.innerHeight);
-// });
 
 const geometry = new PlaneGeometry(1, 1);
 
