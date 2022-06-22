@@ -1,4 +1,5 @@
 varying vec3 vNormal;
+varying vec3 vPosition;
 
 float inverseLerp(float v, float minValue, float maxValue) {
     return (v - minValue) / (maxValue - minValue);
@@ -9,17 +10,18 @@ float remap(float v, float inMin, float inMax, float outMin, float outMax) {
     return mix(outMin, outMax, t);
 }
 
-// vec3 toSRGB(vec3 value) {
-//     vec3 lt = vec3(lessThanEqual(value.rgb, vec3(0.0031308)));
-//     vec3 v1 = value * 12.92;
-//     vec3 v2 = pow(value.xyz, vec3(0.41666)) * 1.055 - vec3(0.055);
-//     return mix(v2, v1, lt);
-// }
+vec3 phongSpecular(vec3 viewDir, vec3 lightDir, vec3 lightColor, vec3 normal) {
+    vec3 reflectDir = normalize(reflect(-lightDir, normal));
+    float phongValue = max(0.0, dot(viewDir, reflectDir));
+    phongValue = pow(phongValue, 32.0);
+    return lightColor * phongValue;
+}
 
 void main() {
     vec3 baseColor = vec3(0.5);
     vec3 lighting = vec3(0.0);
     vec3 normal = normalize(vNormal);
+    vec3 viewDir = normalize(cameraPosition - vPosition);
 
     // Ambient
     vec3 ambeint = vec3(0.5);
@@ -36,9 +38,17 @@ void main() {
     float dp = max(0.0, dot(lightDir, normal));
     vec3 diffuse = dp * lightColor;
 
-    lighting = ambeint * 0.0 + hemi * 0.0 + diffuse * 1.0;
+    // Phong specular
+    vec3 r = normalize(reflect(-lightDir, normal));
+    float phongValue = max(0.0, dot(viewDir, r));
+    float specularPower = 32.0;
+    phongValue = pow(phongValue, specularPower);
 
-    vec3 color = baseColor * lighting;
+    vec3 specular = vec3(phongValue);
+
+    lighting = ambeint * 1.0 + hemi * 1.0 + diffuse * 1.0;
+
+    vec3 color = baseColor * lighting + specular;
 
     color = pow(color, vec3(1.0 / 2.2));
 
