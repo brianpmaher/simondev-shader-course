@@ -1,12 +1,13 @@
 import {
   CubeTextureLoader,
+  IcosahedronGeometry,
+  Mesh,
   PerspectiveCamera,
   Scene,
   ShaderMaterial,
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 const renderer = new WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -50,14 +51,17 @@ const material = new ShaderMaterial({
   fragmentShader,
 });
 
-const gltfLoader = new GLTFLoader();
-gltfLoader.setPath('assets/models/');
-gltfLoader.load('suzanne.glb', gltf => {
-  gltf.scene.traverse((c: any) => {
-    c.material = material;
-  });
-  scene.add(gltf.scene);
-});
+// const gltfLoader = new GLTFLoader();
+// gltfLoader.setPath('assets/models/');
+// gltfLoader.load('suzanne.glb', gltf => {
+//   gltf.scene.traverse((c: any) => {
+//     c.material = material;
+//   });
+//   scene.add(gltf.scene);
+// });
+const geometry = new IcosahedronGeometry(1, 128);
+const mesh = new Mesh(geometry, material);
+scene.add(mesh);
 
 (function runLoop(t: number) {
   requestAnimationFrame(runLoop);
