@@ -23,7 +23,13 @@ void main() {
     float hemiMix = remap(normal.y, -1.0, 1.0, 0.0, 1.0);
     vec3 hemi = mix(groundColor, skyColor, hemiMix);
 
-    lighting = ambeint * 0.0 + hemi;
+    // Diffuse lighting
+    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+    vec3 lightColor = vec3(1.0, 1.0, 0.9);
+    float dp = max(0.0, dot(lightDir, normal));
+    vec3 diffuse = dp * lightColor;
+
+    lighting = ambeint * 0.0 + hemi * 0.5 + diffuse * 0.5;
 
     vec3 color = baseColor * lighting;
 
