@@ -1,59 +1,66 @@
 import {
-  Mesh,
-  OrthographicCamera,
-  PCFSoftShadowMap,
-  PlaneGeometry,
+  CubeTextureLoader,
+  PerspectiveCamera,
   Scene,
   ShaderMaterial,
-  TextureLoader,
   WebGLRenderer,
 } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-const renderer = new WebGLRenderer({ antialias: true });
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFSoftShadowMap;
-renderer.setPixelRatio(window.devicePixelRatio);
+const renderer = new WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 document.body.appendChild(renderer.domElement);
-window.addEventListener('resize', () =>
-  renderer.setSize(window.innerWidth, window.innerHeight),
-);
 
 const scene = new Scene();
 
-const camera = new OrthographicCamera(0, 1, 1, 0, 0.1, 1000);
-camera.position.set(0, 0, 1);
+const camera = new PerspectiveCamera(60, 1920.0 / 1080.0, 0.1, 1000.0);
+camera.position.set(1, 0, 3);
 
-const vertexShader = await fetch('src/shaders/vertex-shader.glsl').then((r) =>
-  r.text(),
-);
-const fragmentShader = await fetch('src/shaders/fragment-shader.glsl').then(
-  (r) => r.text(),
-);
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+});
 
-const textureLoader = new TextureLoader();
-const lakeTexture = textureLoader.load('assets/textures/hebgen-lake.jpg');
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0, 0);
+controls.update();
+
+const cubeTextureLoader = new CubeTextureLoader();
+const backgroundTexture = cubeTextureLoader.load([
+  'assets/textures/Cold_Sunset__Cam_2_Left+X.png',
+  'assets/textures/Cold_Sunset__Cam_3_Right-X.png',
+  'assets/textures/Cold_Sunset__Cam_4_Up+Y.png',
+  'assets/textures/Cold_Sunset__Cam_5_Down-Y.png',
+  'assets/textures/Cold_Sunset__Cam_0_Front+Z.png',
+  'assets/textures/Cold_Sunset__Cam_1_Back-Z.png',
+]);
+scene.background = backgroundTexture;
+
+const [vertexShader, fragmentShader] = await Promise.all([
+  fetch('src/shaders/vertex-shader.glsl').then(r => r.text()),
+  fetch('src/shaders/fragment-shader.glsl').then(r => r.text()),
+]);
 
 const material = new ShaderMaterial({
-  uniforms: {
-    diffuse: { value: lakeTexture },
-    time: { value: 0.0 },
-  },
+  uniforms: { specMap: { value: scene.background } },
   vertexShader,
   fragmentShader,
 });
 
-const geometry = new PlaneGeometry(1, 1);
-
-const plane = new Mesh(geometry, material);
-plane.position.set(0.5, 0.5, 0);
-scene.add(plane);
+const gltfLoader = new GLTFLoader();
+gltfLoader.setPath('assets/models/');
+gltfLoader.load('suzanne.glb', gltf => {
+  gltf.scene.traverse((c: any) => {
+    c.material = material;
+  });
+  scene.add(gltf.scene);
+});
 
 (function runLoop(t: number) {
   requestAnimationFrame(runLoop);
-
-  material.uniforms.time.value = t * 0.001;
 
   renderer.render(scene, camera);
 })(0);
