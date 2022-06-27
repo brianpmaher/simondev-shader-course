@@ -1,3 +1,5 @@
+uniform samplerCube specMap;
+
 varying vec3 vNormal;
 varying vec3 vPosition;
 
@@ -10,15 +12,8 @@ float remap(float v, float inMin, float inMax, float outMin, float outMax) {
     return mix(outMin, outMax, t);
 }
 
-vec3 phongSpecular(vec3 viewDir, vec3 lightDir, vec3 lightColor, vec3 normal) {
-    vec3 reflectDir = normalize(reflect(-lightDir, normal));
-    float phongValue = max(0.0, dot(viewDir, reflectDir));
-    phongValue = pow(phongValue, 32.0);
-    return lightColor * phongValue;
-}
-
 void main() {
-    vec3 baseColor = vec3(0.5);
+    vec3 baseColor = vec3(0.0);
     vec3 lighting = vec3(0.0);
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(cameraPosition - vPosition);
@@ -43,10 +38,14 @@ void main() {
     float phongValue = max(0.0, dot(viewDir, r));
     float specularPower = 32.0;
     phongValue = pow(phongValue, specularPower);
-
     vec3 specular = vec3(phongValue);
 
-    lighting = ambeint * 1.0 + hemi * 1.0 + diffuse * 1.0;
+    // IBL specular
+    vec3 iblCoord = normalize(reflect(-viewDir, normal));
+    vec3 iblSample = textureCube(specMap, iblCoord).xyz;
+    specular += iblSample * 0.5;
+
+    lighting = ambeint * 0.5 + hemi * 1.0 + diffuse * 0.5;
 
     vec3 color = baseColor * lighting + specular;
 
